@@ -51,12 +51,19 @@ def generate_blocks():
     return blocks
 
 # --------------------------
-# 인접 여부 확인
+# 선택 가능한 인접 블록 계산 (DFS)
 # --------------------------
-def is_adjacent(pos1, pos2):
-    r1, c1 = pos1
-    r2, c2 = pos2
-    return abs(r1 - r2) + abs(c1 - c2) == 1  # 상하좌우 인접
+def get_connected_positions(start_pos, blocks):
+    visited = set()
+    stack = [start_pos]
+    while stack:
+        r, c = stack.pop()
+        visited.add((r, c))
+        for dr, dc in [(-1,0),(1,0),(0,-1),(0,1)]:
+            nr, nc = r+dr, c+dc
+            if 0<=nr<ROWS and 0<=nc<COLS and blocks[nr][nc]>0 and (nr,nc) not in visited:
+                stack.append((nr, nc))
+    return visited
 
 # --------------------------
 # 게임 상태 초기화
@@ -99,8 +106,10 @@ while running:
                 if not selected:
                     selected.append((r, c)) # 첫 번째 블록은 자유롭게 선택
                 else:
-                    if (r, c) not in selected and is_adjacent(selected[-1], (r, c)):
-                        selected.append((r ,c))     # 마지막 선택 블록과 인접해야 선택 가능
+                     # 마지막 선택 블록과 연결되어 있는 블록만 선택 가능
+                    connected = get_connected_positions(selected[0], blocks)
+                    if (r, c) in connected and (r, c) not in selected:
+                        selected.append((r, c)) 
 
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN:  # 선택 확정
