@@ -59,11 +59,27 @@ def get_connected_positions(start_pos, blocks):
     while stack:
         r, c = stack.pop()
         visited.add((r, c))
-        for dr, dc in [(-1,0),(1,0),(0,-1),(0,1)]:
+        for dr, dc in [(-1,0),(1,0),(0,-1),(0,1)]:   # 상하좌우만
             nr, nc = r+dr, c+dc
             if 0<=nr<ROWS and 0<=nc<COLS and blocks[nr][nc]>0 and (nr,nc) not in visited:
                 stack.append((nr, nc))
     return visited
+
+# --------------------------
+# 선택 블록이 직사각형이고 내부에 방해 블록 없는지 확인
+# --------------------------
+def is_rectangle_clear(selected, blocks):
+    if not selected:
+        return False
+    rows = [r for r,c in selected]
+    cols = [c for r,c in selected]
+    min_r, max_r = min(rows), max(rows)
+    min_c, max_c = min(cols), max(cols)
+    for r in range(min_r, max_r+1):
+        for c in range(min_c, max_c+1):
+            if (r,c) not in selected and blocks[r][c] > 0:
+                return False
+    return True
 
 # --------------------------
 # 게임 상태 초기화
@@ -114,7 +130,7 @@ while running:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN:  # 선택 확정
                 total = sum(blocks[r][c] for r, c in selected)
-                if total == 10:
+                if total == 10 and is_rectangle_clear(selected, blocks):
                     for r, c in selected:
                         blocks[r][c] = 0
                     score += 10
