@@ -51,6 +51,14 @@ def generate_blocks():
     return blocks
 
 # --------------------------
+# 인접 여부 확인
+# --------------------------
+def is_adjacent(pos1, pos2):
+    r1, c1 = pos1
+    r2, c2 = pos2
+    return abs(r1 - r2) + abs(c1 - c2) == 1  # 상하좌우 인접
+
+# --------------------------
 # 게임 상태 초기화
 # --------------------------
 blocks = generate_blocks()
@@ -87,9 +95,12 @@ while running:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mx, my = pygame.mouse.get_pos()
             c, r = mx // CELL_SIZE, my // CELL_SIZE
-            if 0 <= r < ROWS and 0 <= c < COLS:
-                if (r, c) not in selected:
-                    selected.append((r, c))
+            if 0 <= r < ROWS and 0 <= c < COLS and blocks[r][c] > 0: #blocks[r][c] > 0 조건을 생각안함
+                if not selected:
+                    selected.append((r, c)) # 첫 번째 블록은 자유롭게 선택
+                else:
+                    if (r, c) not in selected and is_adjacent(selected[-1], (r, c)):
+                        selected.append((r ,c))     # 마지막 선택 블록과 인접해야 선택 가능
 
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN:  # 선택 확정
