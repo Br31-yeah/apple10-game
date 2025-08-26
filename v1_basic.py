@@ -117,8 +117,10 @@ while running:
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mx, my = pygame.mouse.get_pos()
-            c, r = mx // CELL_SIZE, my // CELL_SIZE
-            if 0 <= r < ROWS and 0 <= c < COLS and blocks[r][c] > 0: #blocks[r][c] > 0 조건을 생각안함
+            # 외곽 블록 클릭 문제 해결
+            c = min(mx // CELL_SIZE, COLS - 1)
+            r = min(my // CELL_SIZE, ROWS - 1)
+            if blocks[r][c] > 0: #blocks[r][c] > 0 조건을 생각안함
                 if not selected:
                     selected.append((r, c)) # 첫 번째 블록은 자유롭게 선택
                 else:
